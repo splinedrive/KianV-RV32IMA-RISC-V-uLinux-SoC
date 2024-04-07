@@ -17,8 +17,12 @@ jobs:
       #- name: Build GDS
       #  uses: TinyTapeout/tt-gds-action@tt06
 
+      #- name: Build GDS
+      #  uses: MichaelBell/tt-gds-action@tt06-no-pin-swaps
+
+      # The XXL pre-release action
       - name: Build GDS
-        uses: MichaelBell/tt-gds-action@tt06-no-pin-swaps
+        uses: TinyTapeout/tt-gds-action@tt06-xxl-experimental
   
   precheck:
     needs: gds
