@@ -1,1 +1,2 @@
-cocotb==1.8.0
+cocotb==1.8.1
+cocotbext-uart==0.1.2

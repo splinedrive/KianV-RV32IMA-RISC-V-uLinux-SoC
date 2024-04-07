@@ -1,39 +1,48 @@
 [*]
-[*] GTKWave Analyzer v3.4.0 (w)1999-2022 BSI
-[*] Mon Nov 20 16:00:28 2023
+[*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
+[*] Mon Oct 23 10:31:32 2023
 [*]
-[dumpfile] "/home/uri/p/tt-new-template-proto/test/tb.vcd"
-[dumpfile_mtime] "Mon Nov 20 15:58:34 2023"
-[dumpfile_size] 1110
-[savefile] "/home/uri/p/tt-new-template-proto/test/tb.gtkw"
+[dumpfile] "/home/uri/p/KianV_rv32ia_uLinux_SoC/test/tb.vcd"
+[dumpfile_mtime] "Mon Oct 23 10:31:22 2023"
+[dumpfile_size] 8534938
+[savefile] "/home/uri/p/KianV_rv32ia_uLinux_SoC/test/tb.gtkw"
 [timestart] 0
-[size] 1376 600
+[size] 1908 999
 [pos] -1 -1
-*-24.534533 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-28.410385 1758000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] tb.
-[sst_width] 297
-[signals_width] 230
+[treeopen] tb.tt_um_kianV_rv32ima_uLinux_SoC_I.
+[treeopen] tb.tt_um_kianV_rv32ima_uLinux_SoC_I.soc_I.kianv_I.
+[treeopen] tb.tt_um_kianV_rv32ima_uLinux_SoC_I.soc_I.kianv_I.datapath_unit_I.
+[sst_width] 280
+[signals_width] 174
 [sst_expanded] 1
-[sst_vpaned_height] 158
+[sst_vpaned_height] 292
 @28
-tb.user_project.ena
+tb.clk
+tb.rst_n
+@200
+-
+-SoC
+@22
+tb.tt_um_kianV_rv32ima_uLinux_SoC_I.soc_I.PC[31:0]
+tb.tt_um_kianV_rv32ima_uLinux_SoC_I.soc_I.qqspi_I.rdata[31:0]
+@200
+-
+-UART
 @29
-tb.user_project.clk
+tb.tt_um_kianV_rv32ima_uLinux_SoC_I.soc_I.uart_rx
 @28
-tb.user_project.rst_n
+tb.uart_tx
 @200
--Inputs
-@22
-tb.user_project.ui_in[7:0]
-@200
--Bidirectional Pins
-@22
-tb.user_project.uio_in[7:0]
-tb.user_project.uio_oe[7:0]
-tb.user_project.uio_out[7:0]
-@200
--Output Pins
-@22
-tb.user_project.uo_out[7:0]
+-
+-Flash
+@28
+tb.flash_clk
+tb.flash_csb
+tb.flash_io0
+tb.flash_io1
+tb.flash_io2
+tb.flash_io3
 [pattern_trace] 1
 [pattern_trace] 0

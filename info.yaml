@@ -1,26 +1,59 @@
 # Tiny Tapeout project information
 project:
-  title:        ""      # Project title
-  author:       ""      # Your name
+  title:        "KianV uLinux SoC"      # Project title
+  author:       "Hirosh Dabui"      # Your name
   discord:      ""      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
-  description:  ""      # One line description of what your project does
-  language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
+  description:  "A RISC-V ASIC that can boot μLinux."      # One line description of what your project does
+  language:     "verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
   clock_hz:     0       # Clock frequency in Hz (or 0 if not applicable)
 
   # How many tiles your design occupies? A single tile is about 167x108 uM.
-  tiles: "1x1"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
+  tiles: "8x2"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
 
   # Your top module name must start with "tt_um_". Make it unique by including your github username:
-  top_module:  "tt_um_example"
-  
+  top_module:  "tt_um_kianV_rv32ima_uLinux_SoC"
+
   # List your project's source files here. Source files must be in ./src and you must list each source file separately, one per line:
-  source_files:        
-    - "project.v"
+  source_files:
+    - "tt_um_kianV_rv32ima_uLinux_SoC.v"
+    - "tx_uart.v"
+    - "clint.v"
+    - "rx_uart.v"
+    - "qqspi.v"
+    - "soc.v"
+    - "fifo.v"
+    - "csr_decoder.v"
+    - "misa.vh"
+    - "alu_decoder.v"
+    - "register_file.v"
+    - "design_elements.v"
+    - "riscv_defines.vh"
+    - "main_fsm.v"
+    - "csr_exception_handler.v"
+    - "control_unit.v"
+    - "store_decoder.v"
+    - "datapath_unit.v"
+    - "csr_utilities.vh"
+    - "riscv_priv_csr_status.vh"
+    - "load_decoder.v"
+    - "extend.v"
+    - "rv32_amo_opcodes.vh"
+    - "load_alignment.v"
+    - "mcause.vh"
+    - "kianv_harris_mc_edition.v"
+    - "alu.v"
+    - "store_alignment.v"
+    - "defines_soc.vh"
+    - "divider.v"
+    - "divider_decoder.v"
+    - "multiplier.v"
+    - "multiplier_decoder.v"
+    - "multiplier_extension_decoder.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 pinout:
   # Inputs
-  ui[0]: ""
+  ui[0]: "uart_rx"
   ui[1]: ""
   ui[2]: ""
   ui[3]: ""
@@ -30,24 +63,25 @@ pinout:
   ui[7]: ""
 
   # Outputs
-  uo[0]: ""
-  uo[1]: ""
-  uo[2]: ""
-  uo[3]: ""
-  uo[4]: ""
-  uo[5]: ""
-  uo[6]: ""
-  uo[7]: ""
+  uo[0]: "led[0]"
+  uo[1]: "led[1]"
+  uo[2]: "led[2]"
+  uo[3]: "led[3]"
+  uo[4]: "uart_tx"
+  uo[5]: "led[4]"
+  uo[6]: "led[5]"
+  uo[7]: "led[6]"
 
   # Bidirectional pins
-  uio[0]: ""
-  uio[1]: ""
-  uio[2]: ""
-  uio[3]: ""
-  uio[4]: ""
-  uio[5]: ""
-  uio[6]: ""
-  uio[7]: ""
+  uio[0]: "ce0 flash"
+  uio[1]: "sio0"
+  uio[2]: "sio1"
+  uio[3]: "sck"
+  uio[4]: "sd2"
+  uio[5]: "sd3"
+  uio[6]: "cs1 psram"
+  uio[7]: "always high"
 
 # Do not change!
 yaml_version: 6
+

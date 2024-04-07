@@ -1,32 +1,34 @@
-# SPDX-FileCopyrightText: © 2024 Tiny Tapeout
-# SPDX-License-Identifier: MIT
-
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
+from cocotbext.uart import UartSource, UartSink
 
 @cocotb.test()
-async def test_project(dut):
-  dut._log.info("Start")
-  
-  # Our example module doesn't use clock and reset, but we show how to use them here anyway.
-  clock = Clock(dut.clk, 10, units="us")
-  cocotb.start_soon(clock.start())
+async def test_uart(dut):
+    dut._log.info("start")
+    clock = Clock(dut.clk, 100, units="ns")
+    cocotb.start_soon(clock.start())
 
-  # Reset
-  dut._log.info("Reset")
-  dut.ena.value = 1
-  dut.ui_in.value = 0
-  dut.uio_in.value = 0
-  dut.rst_n.value = 0
-  await ClockCycles(dut.clk, 10)
-  dut.rst_n.value = 1
+    uart_source = UartSource(dut.uart_rx, baud=115200, bits=8)
+    uart_sink = UartSink(dut.uart_tx, baud=115200, bits=8)
 
-  # Set the input values, wait one clock cycle, and check the output
-  dut._log.info("Test")
-  dut.ui_in.value = 20
-  dut.uio_in.value = 30
+    dut.rst_n.value = 0
+    await ClockCycles(dut.clk, 10)
+    dut.rst_n.value = 1
+        
+    await ClockCycles(dut.clk, 20000*6)
 
-  await ClockCycles(dut.clk, 1)
+    expected_str = b"Hello UART\n"
+    data = uart_sink.read_nowait(len(expected_str))
+    dut._log.info(f"UART Data: {data}")
+    assert data == expected_str
 
-  assert dut.uo_out.value == 50
+    # The code should convert these to lowercase and echo them
+    await uart_source.write(b'Q')
+    await ClockCycles(dut.clk, 2500)
+    await uart_source.write(b'A')
+    await ClockCycles(dut.clk, 4000)
+
+    data = uart_sink.read_nowait(2)
+    dut._log.info(f"UART Data: {data}")
+    assert data == b"qa"
