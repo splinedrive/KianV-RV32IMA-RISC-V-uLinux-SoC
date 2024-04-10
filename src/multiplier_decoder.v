@@ -29,7 +29,7 @@ module multiplier_decoder (
   wire is_mulh = funct3 == 3'b001;
   wire is_mulsu = funct3 == 3'b010;
   wire is_mulu = funct3 == 3'b011;
-  reg                               valid;
+  reg  valid;
 
   assign mul_valid = valid & mul_ext_valid;
   always @(*) begin

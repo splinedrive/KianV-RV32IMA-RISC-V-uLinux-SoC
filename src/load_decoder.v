@@ -19,34 +19,33 @@
 `default_nettype none
 
 `include "riscv_defines.vh"
-module load_decoder
-    (
-        input  wire [ 2: 0] funct3,
-        input wire amo_data_load,
-        output reg  [`LOAD_OP_WIDTH -1: 0] LOADop
-    );
-    wire is_lb      = funct3 == 3'b 000;
-    wire is_lh      = funct3 == 3'b 001;
-    wire is_lw      = funct3 == 3'b 010;
-    wire is_lbu     = funct3 == 3'b 100;
-    wire is_lhu     = funct3 == 3'b 101;
+module load_decoder (
+    input wire [2:0] funct3,
+    input wire amo_data_load,
+    output reg [`LOAD_OP_WIDTH -1:0] LOADop
+);
+  wire is_lb = funct3 == 3'b000;
+  wire is_lh = funct3 == 3'b001;
+  wire is_lw = funct3 == 3'b010;
+  wire is_lbu = funct3 == 3'b100;
+  wire is_lhu = funct3 == 3'b101;
 
-    always @(*) begin
-        if (!amo_data_load) begin
-            case (1'b1)
-                is_lb  : LOADop = `LOAD_OP_LB;
-                is_lh  : LOADop = `LOAD_OP_LH;
-                is_lw  : LOADop = `LOAD_OP_LW;
-                is_lbu : LOADop = `LOAD_OP_LBU;
-                is_lhu : LOADop = `LOAD_OP_LHU;
-                default:
-                    /* verilator lint_off WIDTH */
-                    LOADop = 'hxx;
-                /* verilator lint_on WIDTH */
-            endcase
-        end else begin
-            LOADop = `LOAD_OP_LW;
-        end
+  always @(*) begin
+    if (!amo_data_load) begin
+      case (1'b1)
+        is_lb: LOADop = `LOAD_OP_LB;
+        is_lh: LOADop = `LOAD_OP_LH;
+        is_lw: LOADop = `LOAD_OP_LW;
+        is_lbu: LOADop = `LOAD_OP_LBU;
+        is_lhu: LOADop = `LOAD_OP_LHU;
+        default:
+        /* verilator lint_off WIDTH */
+        LOADop = 'hxx;
+        /* verilator lint_on WIDTH */
+      endcase
+    end else begin
+      LOADop = `LOAD_OP_LW;
     end
+  end
 
 endmodule

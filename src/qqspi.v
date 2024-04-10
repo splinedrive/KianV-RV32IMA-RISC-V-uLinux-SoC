@@ -23,8 +23,9 @@
 // added wmask, sync-comb fsm, spi flash support, cen polarity, faster during
 // write operations: sb, sh behaves likes 8Mx32 memory
 `default_nettype none
-module qqspi #(parameter CHIP_SELECTS = 3)
-(
+module qqspi #(
+    parameter CHIP_SELECTS = 3
+) (
     input wire [22:0] addr,  // 8Mx32
     output reg [31:0] rdata,
     input wire [31:0] wdata,
@@ -57,7 +58,7 @@ module qqspi #(parameter CHIP_SELECTS = 3)
   localparam [7:0] CMD_READ = 8'h03;
 
   //reg  [3:0] sio_oe;
-  reg  [3:0] sio_out;
+  reg [3:0] sio_out;
   wire [3:0] sio_in;
 
   wire write;

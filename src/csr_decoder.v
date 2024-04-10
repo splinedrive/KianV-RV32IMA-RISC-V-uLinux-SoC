@@ -36,8 +36,8 @@ module csr_decoder (
   wire is_csrrsi = funct3 == 3'b110;
   wire is_csrrci = funct3 == 3'b111;
 
-  reg we;
-  reg re;
+  reg  we;
+  reg  re;
 
   assign CSRwe = we && valid;
   assign CSRre = re && valid;

@@ -29,7 +29,7 @@ module divider_decoder (
   wire is_divu = funct3 == 3'b101;
   wire is_rem = funct3 == 3'b110;
   wire is_remu = funct3 == 3'b111;
-  reg                              valid;
+  reg  valid;
 
   assign div_valid = valid & mul_ext_valid;
 

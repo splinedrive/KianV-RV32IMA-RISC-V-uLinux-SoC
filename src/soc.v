@@ -24,7 +24,7 @@ module soc (
     input  wire       clk_osc,
     output wire       uart_tx,
     input  wire       uart_rx,
-    output wire [6:0] led,
+    output wire [3:0] led,
     output wire [2:0] ce,
     output wire       sclk,
 
@@ -38,6 +38,11 @@ module soc (
     output wire sio2_o,
     output wire sio3_o,
 
+    output wire spi_cen0,
+    output wire spi_sclk0,
+    input  wire spi_sio1_so_miso0,
+    output wire spi_sio0_si_mosi0,
+
     output wire [3:0] sio_oe,
 
     input wire rst_n
@@ -49,9 +54,9 @@ module soc (
 
 
 
-  assign led  = PC[16+:7];
+  assign led = PC[16+:4];
 
-  assign clk  = clk_osc;
+  assign clk = clk_osc;
 
   localparam BYTE_ADDRESS_LEN = 32;
   localparam BYTES_PER_BLOCK = 4;
@@ -78,45 +83,54 @@ module soc (
   end
 
   // cpu
-  wire                      [31:0]                                           pc;
-  wire                      [ 5:0]                                           ctrl_state;
+  wire [31:0] pc;
+  wire [ 5:0] ctrl_state;
 
-  wire                                                                       cpu_mem_ready;
-  wire                                                                       cpu_mem_valid;
+  wire        cpu_mem_ready;
+  wire        cpu_mem_valid;
 
-  wire                      [ 3:0]                                           cpu_mem_wstrb;
-  wire                      [31:0]                                           cpu_mem_addr;
-  wire                      [31:0]                                           cpu_mem_wdata;
-  wire                      [31:0]                                           cpu_mem_rdata;
+  wire [ 3:0] cpu_mem_wstrb;
+  wire [31:0] cpu_mem_addr;
+  wire [31:0] cpu_mem_wdata;
+  wire [31:0] cpu_mem_rdata;
 
-  wire                      [31:0]                                           bram_rdata;
-  reg                                                                        bram_ready;
-  wire                                                                       bram_valid;
+  wire [31:0] bram_rdata;
+  reg         bram_ready;
+  wire        bram_valid;
 
   // uart
-  wire                                                                       uart_tx_valid;
-  reg                                                                        uart_tx_ready;
+  wire        uart_tx_valid;
+  reg         uart_tx_ready;
   // uart
-  wire                                                                       uart_rx_valid;
-  reg                                                                        uart_rx_ready;
+  wire        uart_rx_valid;
+  reg         uart_rx_ready;
 
   // spi flash memory
-  wire                      [31:0]                                           spi_nor_mem_data;
-  wire                                                                       spi_nor_mem_valid;
+  wire [31:0] spi_nor_mem_data;
+  wire        spi_nor_mem_valid;
+
+  // spi interface
+  wire [31:0] spi_mem_data0;
+  wire        spi_mem_valid0;
+  wire        spi_mem_ready0;
+
 
   // divider
-  wire                                                                       div_valid;
-  reg                                                                        div_ready;
+  wire        div_valid;
+  reg         div_ready;
+
+  wire        spi_div_valid;
+  reg         spi_div_ready;
 
   // RISC-V is byte-addressable, alignment memory devices word organized
   // memory interface
-  wire wr = |cpu_mem_wstrb;
-  wire rd = ~wr;
+  wire        wr = |cpu_mem_wstrb;
+  wire        rd = ~wr;
 
-  wire                      [29:0] word_aligned_addr = {cpu_mem_addr[31:2]};
+  wire [29:0] word_aligned_addr = {cpu_mem_addr[31:2]};
 
   // cpu_freq
-  reg                       [31:0]                                           div_reg;
+  reg  [31:0] div_reg;
   assign div_valid = !div_ready && cpu_mem_valid && (cpu_mem_addr == `DIV_ADDR);  // && !wr;
   always @(posedge clk) div_ready <= !resetn ? 1'b0 : div_valid;
   always @(posedge clk) begin
@@ -124,6 +138,18 @@ module soc (
       div_reg <= 0;
     end else begin
       if (div_valid && wr) div_reg <= cpu_mem_wdata;
+    end
+  end
+  /////////////////////////////////////////////////////////////////////////////
+
+  reg [31:0] spi_div_reg;
+  assign spi_div_valid = !spi_div_ready && cpu_mem_valid && (cpu_mem_addr == `KIANV_SPI_DIV_ADDR);  // && !wr;
+  always @(posedge clk) spi_div_ready <= !resetn ? 1'b0 : spi_div_valid;
+  always @(posedge clk) begin
+    if (!resetn) begin
+      spi_div_reg <= 0;
+    end else begin
+      if (spi_div_valid && wr) spi_div_reg <= cpu_mem_wdata;
     end
   end
   /////////////////////////////////////////////////////////////////////////////
@@ -143,7 +169,9 @@ module soc (
   wire [31:0] qqspi_mem_rdata;
   wire qqspi_mem_ready;
 
-  qqspi #(.CHIP_SELECTS(3)) qqspi_I (
+  qqspi #(
+      .CHIP_SELECTS(3)
+  ) qqspi_I (
       .addr({1'b0, word_aligned_addr[21:0]}),
       .wdata(cpu_mem_wdata),
       .rdata(qqspi_mem_rdata),
@@ -199,7 +227,7 @@ module soc (
 
   /////////////////////////////////////////////////////////////////////////////
   wire uart_lsr_valid_rd = ~uart_lsr_rdy && rd && cpu_mem_valid && cpu_mem_addr == `UART_LSR_ADDR;
-  reg uart_lsr_rdy;
+  reg  uart_lsr_rdy;
   always @(posedge clk) uart_lsr_rdy <= !resetn ? 1'b0 : uart_lsr_valid_rd;
 
   /////////////////////////////////////////////////////////////////////////////
@@ -225,6 +253,31 @@ module soc (
       .data   (rx_uart_data)
   );
 
+  /////////////////////////////////////////////////////////////////////////////
+  // SPI
+
+  assign spi_mem_valid0 = !spi_mem_ready0 && cpu_mem_valid &&
+           (cpu_mem_addr == `KIANV_SPI_CTRL0 || cpu_mem_addr == `KIANV_SPI_DATA0);
+  spi #(
+      .CPOL(1'b1)
+  ) spi0_I (
+      .clk   (clk),
+      .resetn(resetn),
+      .ctrl  (cpu_mem_addr[2]),
+      .rdata (spi_mem_data0),
+      .wdata (cpu_mem_wdata),
+      .wstrb (cpu_mem_wstrb),
+      .valid (spi_mem_valid0),
+      /* verilator lint_off WIDTHTRUNC */
+      .div   (spi_div_reg[15:0]),
+      /* verilator lint_on WIDTHTRUNC */
+      .ready (spi_mem_ready0),
+
+      .cen         (spi_cen0),
+      .sclk        (spi_sclk0),
+      .sio1_so_miso(spi_sio1_so_miso0),
+      .sio0_si_mosi(spi_sio0_si_mosi0)
+  );
   /////////////////////////////////////////////////////////////////////////////
 
   wire IRQ3;
@@ -268,7 +321,7 @@ module soc (
 
   /////////////////////////////////////////////////////////////////////////////
   wire is_io = (cpu_mem_addr >= 32'h10_000_000 && cpu_mem_addr <= 32'h12_000_000);
-  wire unmatched_io = !(uart_lsr_valid_rd || uart_tx_valid || uart_rx_valid || clint_valid || div_valid);
+  wire unmatched_io = !(uart_lsr_valid_rd || uart_tx_valid || uart_rx_valid || clint_valid || div_valid || spi_div_valid);
 
   wire access_fault = cpu_mem_valid & (!is_io || !is_sdram);
 
@@ -297,6 +350,12 @@ module soc (
         io_ready = 1'b1;
       end else if (div_ready) begin
         io_rdata = div_reg;
+        io_ready = 1'b1;
+      end else if (spi_div_ready) begin
+        io_rdata = spi_div_reg;
+        io_ready = 1'b1;
+      end else if (spi_mem_ready0) begin
+        io_rdata = spi_mem_data0;
         io_ready = 1'b1;
       end else if (unmatched_io) begin
         io_rdata = 0;

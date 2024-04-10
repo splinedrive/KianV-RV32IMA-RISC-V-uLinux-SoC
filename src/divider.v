@@ -60,7 +60,7 @@ module divider (
   wire [31:0] divisor_abs = (is_signed & divisor[31]) ? ~divisor + 1 : divisor;  // divisor
   assign div_by_zero_err = divisor_abs == 32'b0;
 
-  reg [31:0] div_rslt;
+  reg  [31:0] div_rslt;
   wire [31:0] div_rslt_next = div_rslt << 1;
   /* verilator lint_off WIDTH */
   wire [31:0] rem_rslt_next = (rem_rslt << 1) | div_rslt[31];

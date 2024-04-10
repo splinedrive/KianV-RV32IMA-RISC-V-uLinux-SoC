@@ -21,25 +21,32 @@ module tt_um_kianV_rv32ima_uLinux_SoC (
   wire sio2_o;
   wire sio3_o;
 
+  wire spi_cen0;
+  wire spi_sclk0;
+  wire spi_sio1_so_miso0;
+  wire spi_sio0_si_mosi0;
+
   wire [3:0] sio_oe;
 
   wire uart_tx;
   wire uart_rx;
-  wire [6:0] led;
+  wire [3:0] led;
   wire [2:0] ce;
   wire sclk;
 
   wire clk_osc = clk;
 
-  assign uo_out[0] = led[0];
-  assign uo_out[2:1] = led[2:1];
-  assign uo_out[3] = led[3];
+  assign uo_out[0] = spi_cen0;
+  assign uo_out[1] = spi_sclk0;
+  assign uo_out[2] = spi_sio0_si_mosi0;
+  assign uo_out[3] = led[0];
   assign uo_out[4] = uart_tx;
-  assign uo_out[5] = led[4];
-  assign uo_out[6] = led[5];
-  assign uo_out[7] = led[6];
+  assign uo_out[5] = led[1];
+  assign uo_out[6] = led[2];
+  assign uo_out[7] = led[3];
 
   assign uart_rx = ui_in[3];
+  assign spi_sio1_so_miso0 = ui_in[2];
 
   /*
   assign {sio3_i, sio2_i, sio1_so_miso_i, sio0_si_mosi_i} = {
@@ -52,9 +59,7 @@ module tt_um_kianV_rv32ima_uLinux_SoC (
   assign sio0_si_mosi_i = uio_in[1];
 
   assign uio_oe = {2'b11, sio_oe[3:2], 1'b1, sio_oe[1:0], 1'b1};
-  assign uio_out = {
-    ce[2], ce[1], sio3_o, sio2_o, sclk, sio1_so_miso_o, sio0_si_mosi_o, ce[0]
-  };
+  assign uio_out = {ce[2], ce[1], sio3_o, sio2_o, sclk, sio1_so_miso_o, sio0_si_mosi_o, ce[0]};
 
   soc soc_I (
       .clk_osc(clk_osc),
@@ -73,6 +78,11 @@ module tt_um_kianV_rv32ima_uLinux_SoC (
       .sio1_so_miso_o(sio1_so_miso_o),
       .sio2_o        (sio2_o),
       .sio3_o        (sio3_o),
+
+      .spi_cen0         (spi_cen0),
+      .spi_sclk0        (spi_sclk0),
+      .spi_sio1_so_miso0(spi_sio1_so_miso0),
+      .spi_sio0_si_mosi0(spi_sio0_si_mosi0),
 
       .sio_oe(sio_oe),
       .rst_n (rst_n)

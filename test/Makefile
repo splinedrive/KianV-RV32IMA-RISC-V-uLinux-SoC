@@ -19,6 +19,7 @@ ifneq ($(GATES),yes)
 VERILOG_SOURCES += $(PROJ)/tt_um_kianV_rv32ima_uLinux_SoC.v # $(PROJ)/decoder.v
 VERILOG_SOURCES += $(PROJ)/tx_uart.v
 VERILOG_SOURCES += $(PROJ)/clint.v
+VERILOG_SOURCES += $(PROJ)/spi.v
 VERILOG_SOURCES += $(PROJ)/rx_uart.v
 VERILOG_SOURCES += $(PROJ)/qqspi.v
 VERILOG_SOURCES += $(PROJ)/soc.v

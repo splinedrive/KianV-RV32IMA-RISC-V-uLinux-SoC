@@ -20,9 +20,9 @@
 
 `include "riscv_defines.vh"
 module datapath_unit #(
-    parameter RV32E             = 0,
-    parameter RESET_ADDR        = 0,
-    parameter STACKADDR         = 32'hffff_ffff
+    parameter RV32E      = 0,
+    parameter RESET_ADDR = 0,
+    parameter STACKADDR  = 32'hffff_ffff
 ) (
     input wire clk,
     input wire resetn,
@@ -95,9 +95,9 @@ module datapath_unit #(
   wire [31:0] Rd1;
   wire [31:0] Rd2;
 
-  wire [4:0] Rs1 = Instr[19:15];
-  wire [4:0] Rs2 = Instr[24:20];
-  wire [4:0] Rd = Instr[11:7];
+  wire [ 4:0] Rs1 = Instr[19:15];
+  wire [ 4:0] Rs2 = Instr[24:20];
+  wire [ 4:0] Rd = Instr[11:7];
 
   wire [31:0] WD3;
 
@@ -132,9 +132,9 @@ module datapath_unit #(
   wire [31:0] CSRData;
   wire [ 1:0] mem_addr_align_latch;
   wire [31:0] CSRDataOut;
-/* verilator lint_off UNUSEDSIGNAL */
+  /* verilator lint_off UNUSEDSIGNAL */
   wire        div_by_zero_err;
-/* verilator lint_on UNUSEDSIGNAL */
+  /* verilator lint_on UNUSEDSIGNAL */
 
   assign immb10      = ImmExt[10];
   assign ProgCounter = PC;

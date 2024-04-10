@@ -16,15 +16,20 @@ module tb ();
   reg clk;
   reg rst_n;
   reg ena;
-  wire [7:0] ui_in = {4'b0, uart_rx, 3'b0};
+  wire [7:0] ui_in = {4'b0, uart_rx, spi_sio1_so_miso0, 2'b0};
   wire [7:0] uio_in;
 
   wire [7:0] uo_out;
   wire [7:0] uio_out;
   wire [7:0] uio_oe;
 
+  reg spi_sio1_so_miso0;
   reg uart_rx;
   wire uart_tx = uo_out[4];
+
+  wire spi_cen0 = uo_out[0];
+  wire spi_sclk0 = uo_out[1];
+  wire spi_sio0_si_mosi0 = uo_out[2];
 
   tt_um_kianV_rv32ima_uLinux_SoC tt_um_kianV_rv32ima_uLinux_SoC_I (
       // include power ports for the Gate Level test
