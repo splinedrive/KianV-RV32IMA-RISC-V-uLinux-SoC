@@ -13,8 +13,12 @@ jobs:
         with:
           submodules: recursive
 
+      # The orginal action commented out
+      #- name: Build GDS
+      #  uses: TinyTapeout/tt-gds-action@tt06
+
       - name: Build GDS
-        uses: TinyTapeout/tt-gds-action@tt06
+        uses: MichaelBell/tt-gds-action@tt06-no-pin-swaps
   
   precheck:
     needs: gds
