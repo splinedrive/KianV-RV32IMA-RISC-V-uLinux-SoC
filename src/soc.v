@@ -305,7 +305,7 @@ module soc (
 
   /////////////////////////////////////////////////////////////////////////////
   wire is_io = (cpu_mem_addr >= 32'h10_000_000 && cpu_mem_addr <= 32'h12_000_000);
-  wire unmatched_io = !(uart_lsr_valid_rd || uart_tx_valid || uart_rx_valid || clint_valid || div_valid || spi_div_valid);
+  wire unmatched_io = !(uart_lsr_valid_rd || uart_tx_valid || uart_rx_valid || clint_valid || div_valid || spi_div_valid || spi_mem_valid0);
   wire access_fault = cpu_mem_valid & (!is_io || !is_sdram);
 
   kianv_harris_mc_edition #(

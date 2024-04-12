@@ -101,13 +101,13 @@ int main() {
 
   uint8_t rx = 0;
   CS_ENABLE();
-  if ((rx = SPI_transfer(0xde)) == 0xde >> 1)
+  if ((rx = SPI_transfer(0xde)) != 0xde >> 1)
     return 1;
-  if ((rx = SPI_transfer(0xad)) == 0xad >> 1)
+  if ((rx = SPI_transfer(0xad)) != 0xad >> 1)
     return 1;
-  if ((rx = SPI_transfer(0xbe)) == 0xbe >> 1)
+  if ((rx = SPI_transfer(0xbe)) != 0xdf >> 0)
     return 1;
-  if ((rx = SPI_transfer(0xaf)) == 0xaf >> 1)
+  if ((rx = SPI_transfer(0xaf)) != 0xaf >> 1)
     return 1;
   CS_DISABLE();
 
