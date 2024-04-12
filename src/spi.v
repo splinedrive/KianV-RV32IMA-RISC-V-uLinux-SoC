@@ -37,23 +37,36 @@ module spi #(
     output wire sio0_si_mosi
 );
 
-  wire in_xfer = |xfer_cycles;
-  assign rdata = ctrl ? rx_data : {in_xfer, 30'b0, spi_cen};
+  reg [5:0] xfer_cycles;
+  reg [31:0] rx_data;
+  reg [31:0] rx_data_next;
 
-  reg  spi_cen;
-  reg  spi_cen_nxt;
+  reg sclk_next;
+  reg sio_out_next;
+  reg [7:0] spi_buf_next;
+  reg [5:0] xfer_cycles_next;
+  reg ready_xfer_next;
+  reg ready_xfer;
 
-  reg  sio_out;
+  reg spi_cen;
+  reg spi_cen_nxt;
+
+  reg sio_out;
   wire sio_in;
 
   wire sio;
   assign sio0_si_mosi = sio_out;
   assign sio_in = sio1_so_miso;
 
-  assign ready = ready_xfer || ready_ctrl;
-  assign cen = spi_cen;
+  wire in_xfer = |xfer_cycles;
+  assign rdata = ctrl ? rx_data : {in_xfer, 30'b0, spi_cen};
+
   reg ready_ctrl;
   reg ready_ctrl_next;
+
+  assign ready = ready_xfer || ready_ctrl;
+  assign cen   = spi_cen;
+
   always @(posedge clk) begin
     if (!resetn) begin
       spi_cen <= 1'b1;
@@ -77,19 +90,18 @@ module spi #(
   localparam [0:0] S0_IDLE = 0;
   localparam [0:0] S1_WAIT_FOR_XFER_DONE = 1;
 
+  reg [17:0] tick_cnt;
+  wire tick = tick_cnt == ({2'b0, div} - 1);
+  always @(posedge clk) begin
+    if (!resetn || tick || ~in_xfer) begin
+      tick_cnt <= 0;
+    end else begin
+      if (in_xfer) tick_cnt <= tick_cnt + 1;
+    end
+  end
+
   reg [0:0] state, next_state;
   reg [7:0] spi_buf;
-  reg [5:0] xfer_cycles;
-
-  reg [31:0] rx_data;
-  reg [31:0] rx_data_next;
-
-  reg sclk_next;
-  reg sio_out_next;
-  reg [7:0] spi_buf_next;
-  reg [5:0] xfer_cycles_next;
-  reg ready_xfer_next;
-  reg ready_xfer;
 
   always @(posedge clk) begin
     if (!resetn) begin
@@ -99,6 +111,7 @@ module spi #(
       xfer_cycles <= 0;
       ready_xfer <= 0;
       state <= S0_IDLE;
+      rx_data <= 0;
     end else begin
       state <= next_state;
       sclk <= sclk_next;
@@ -166,16 +179,6 @@ module spi #(
 
     end
 
-  end
-
-  reg [17:0] tick_cnt;
-  wire tick = tick_cnt == ({2'b0, div} - 1);
-  always @(posedge clk) begin
-    if (!resetn || tick || ~in_xfer) begin
-      tick_cnt <= 0;
-    end else begin
-      if (in_xfer) tick_cnt <= tick_cnt + 1;
-    end
   end
 
 endmodule

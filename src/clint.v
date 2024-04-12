@@ -42,7 +42,6 @@ module clint (
   always @(posedge clk) ready <= !resetn ? 1'b0 : is_valid;
 
   reg [63:0] mtime;
-  always @(posedge clk) mtime <= !resetn ? 0 : (tick) ? mtime + 1 : mtime;
 
   wire is_we = |wmask;
 
@@ -92,6 +91,8 @@ module clint (
       end
     end
   end
+
+  always @(posedge clk) mtime <= !resetn ? 0 : (tick) ? mtime + 1 : mtime;
 
   assign IRQ3 = msip;
   assign IRQ7 = (mtime >= mtimecmp);

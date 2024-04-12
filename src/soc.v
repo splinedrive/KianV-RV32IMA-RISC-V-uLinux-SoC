@@ -65,23 +65,6 @@ module soc (
 
   localparam BRAM_ADDR_WIDTH = $clog2(`BRAM_WORDS);
 
-  //////////////////////////////////////////////////////////////////////////////
-  /* SYSCON */
-
-  wire is_valid_reboot_addr = (cpu_mem_addr == `REBOOT_ADDR);
-  wire is_valid_reboot_data = (cpu_mem_wdata[15:0] == `REBOOT_DATA);
-
-  wire is_reboot_valid = cpu_mem_valid && is_valid_reboot_addr && is_valid_reboot_data && wr;
-
-  // reset
-  reg [3:0] rst_cnt;
-  wire resetn = rst_cnt[3];
-
-  always @(posedge clk) begin
-    if (!rst_n || is_reboot_valid) rst_cnt <= 0;
-    else rst_cnt <= rst_cnt + {3'b0, !resetn};
-  end
-
   // cpu
   wire [31:0] pc;
   wire [ 5:0] ctrl_state;
@@ -129,8 +112,27 @@ module soc (
 
   wire [29:0] word_aligned_addr = {cpu_mem_addr[31:2]};
 
+  //////////////////////////////////////////////////////////////////////////////
+  /* SYSCON */
+
+  wire        is_valid_reboot_addr = (cpu_mem_addr == `REBOOT_ADDR);
+  wire        is_valid_reboot_data = (cpu_mem_wdata[15:0] == `REBOOT_DATA);
+
+  wire        is_reboot_valid = cpu_mem_valid && is_valid_reboot_addr && is_valid_reboot_data && wr;
+
+  // reset
+  reg  [ 3:0] rst_cnt;
+  wire        resetn = rst_cnt[3];
+
+  always @(posedge clk) begin
+    if (!rst_n || is_reboot_valid) rst_cnt <= 0;
+    else rst_cnt <= rst_cnt + {3'b0, !resetn};
+  end
+
+
+
   // cpu_freq
-  reg  [31:0] div_reg;
+  reg [31:0] div_reg;
   assign div_valid = !div_ready && cpu_mem_valid && (cpu_mem_addr == `DIV_ADDR);  // && !wr;
   always @(posedge clk) div_ready <= !resetn ? 1'b0 : div_valid;
   always @(posedge clk) begin
@@ -153,6 +155,7 @@ module soc (
     end
   end
   /////////////////////////////////////////////////////////////////////////////
+  wire qqspi_mem_ready;
 
   // SPI nor flash
   assign spi_nor_mem_valid = !qqspi_mem_ready && cpu_mem_valid &&
@@ -167,7 +170,6 @@ module soc (
   /////////////////////////////////////////////////////////////////////////////
 
   wire [31:0] qqspi_mem_rdata;
-  wire qqspi_mem_ready;
 
   qqspi #(
       .CHIP_SELECTS(3)
@@ -226,8 +228,8 @@ module soc (
   );
 
   /////////////////////////////////////////////////////////////////////////////
-  wire uart_lsr_valid_rd = ~uart_lsr_rdy && rd && cpu_mem_valid && cpu_mem_addr == `UART_LSR_ADDR;
   reg  uart_lsr_rdy;
+  wire uart_lsr_valid_rd = ~uart_lsr_rdy && rd && cpu_mem_valid && cpu_mem_addr == `UART_LSR_ADDR;
   always @(posedge clk) uart_lsr_rdy <= !resetn ? 1'b0 : uart_lsr_valid_rd;
 
   /////////////////////////////////////////////////////////////////////////////
@@ -302,6 +304,10 @@ module soc (
   );
 
   /////////////////////////////////////////////////////////////////////////////
+  wire is_io = (cpu_mem_addr >= 32'h10_000_000 && cpu_mem_addr <= 32'h12_000_000);
+  wire unmatched_io = !(uart_lsr_valid_rd || uart_tx_valid || uart_rx_valid || clint_valid || div_valid || spi_div_valid);
+  wire access_fault = cpu_mem_valid & (!is_io || !is_sdram);
+
   kianv_harris_mc_edition #(
       .RESET_ADDR(`RESET_ADDR)
   ) kianv_I (
@@ -320,10 +326,6 @@ module soc (
   );
 
   /////////////////////////////////////////////////////////////////////////////
-  wire is_io = (cpu_mem_addr >= 32'h10_000_000 && cpu_mem_addr <= 32'h12_000_000);
-  wire unmatched_io = !(uart_lsr_valid_rd || uart_tx_valid || uart_rx_valid || clint_valid || div_valid || spi_div_valid);
-
-  wire access_fault = cpu_mem_valid & (!is_io || !is_sdram);
 
   reg io_ready;
   reg [31:0] io_rdata;
