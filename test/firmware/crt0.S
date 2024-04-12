@@ -6,15 +6,22 @@
 
 #define IO_BASE 0x10000000
 #define REG_DIV (IO_BASE + 0x0010)
+#define SPI_REG_DIV (IO_BASE + 0x500000 + 0x0010)
 .equ FREQ, 10000000
 .equ DIVISOR1, 1000
+.equ SPI_DATA_RATE, 100000
 .equ BAUDRATE, 115200
 .equ REG_DIV_VAL, ((FREQ / DIVISOR1) << 16) | (FREQ / BAUDRATE)
+.equ SPI_REG_DIV_VAL, (FREQ / SPI_DATA_RATE)
 
 .type _start, @function
 _start:
     la t0, REG_DIV
     li t1, REG_DIV_VAL
+    sw t1, 0(t0)
+
+    la t0, SPI_REG_DIV
+    li t1, SPI_REG_DIV_VAL
     sw t1, 0(t0)
 
     la sp, __stacktop

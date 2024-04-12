@@ -1,9 +1,13 @@
+Archive member included to satisfy reference by file (symbol)
+
+/opt/riscv32im/lib/gcc/riscv32-unknown-elf/11.1.0/../../../../riscv32-unknown-elf/lib/libc.a(lib_a-memcpy.o)
+                              kernelboot.o (memcpy)
 
 Memory Configuration
 
 Name             Origin             Length             Attributes
 FLASH            0x0000000020100000 0x0000000010000000 xr
-BRAM             0x00000000807fe000 0x0000000000002000 xrw
+BRAM             0x00000000807f8000 0x0000000000008000 xrw
 *default*        0x0000000000000000 0xffffffffffffffff
 
 Linker script and memory map
@@ -22,79 +26,87 @@ END GROUP
 LOAD /opt/riscv32im/lib/gcc/riscv32-unknown-elf/11.1.0/libgcc.a
                 0x0000000080800000                __stacktop = (ORIGIN (BRAM) + LENGTH (BRAM))
 
-.misc           0x0000000020100000       0x7c
+.misc           0x0000000020100000       0x8c
                 0x0000000020100000                . = ALIGN (0x4)
  crt0.o(.text)
- .text          0x0000000020100000       0x7c crt0.o
+ .text          0x0000000020100000       0x8c crt0.o
                 0x0000000020100000                _start
-                0x000000002010007c                . = ALIGN (0x4)
+                0x000000002010008c                . = ALIGN (0x4)
  *(.eh_frame)
  *(.eh_frame_hdr)
  *(.init_array)
  *(.gcc_except_table*)
 
-.rela.dyn       0x000000002010007c        0x0
- .rela.text     0x000000002010007c        0x0 crt0.o
-
-.text           0x000000002010007c        0x0
-                0x000000002010007c                . = ALIGN (0x4)
-                0x000000002010007c                . = ALIGN (0x4)
-                0x000000002010007c                _etext = .
-                0x000000002010007c                _sidata = _etext
-
-.data           0x00000000807fe000      0x234 load address 0x000000002010007c
-                0x00000000807fe000                . = ALIGN (0x4)
-                0x00000000807fe000                _sdata = .
-                0x00000000807fe000                _ram_start = .
+.text           0x000000002010008c      0x3e0
+                0x000000002010008c                . = ALIGN (0x4)
  *(.text)
- .text          0x00000000807fe000      0x180 kernelboot.o
-                0x00000000807fe000                uart_putc
-                0x00000000807fe024                uart_getc
-                0x00000000807fe048                setup_timer_interrupt
-                0x00000000807fe058                timer_interrupt_handler
+ .text          0x000000002010008c      0x184 kernelboot.o
+                0x000000002010008c                uart_putc
+                0x00000000201000b0                uart_getc
+                0x00000000201000d4                uart_puthex_byte
+                0x0000000020100138                uart_puthex
+                0x0000000020100188                setup_timer_interrupt
+                0x0000000020100198                timer_interrupt_handler
+                0x00000000201001e0                SPI_transfer
+ .text          0x0000000020100210      0x128 /opt/riscv32im/lib/gcc/riscv32-unknown-elf/11.1.0/../../../../riscv32-unknown-elf/lib/libc.a(lib_a-memcpy.o)
+                0x0000000020100210                memcpy
  *(.text*)
- .text.startup  0x00000000807fe180       0x9c kernelboot.o
-                0x00000000807fe180                main
-                0x00000000807fe21c                . = ALIGN (0x4)
- *(.data)
- .data          0x00000000807fe21c        0x0 crt0.o
- .data          0x00000000807fe21c        0x0 kernelboot.o
- *(.data*)
- *(.sdata)
- .sdata         0x00000000807fe21c        0xc kernelboot.o
-                0x00000000807fe21c                uart_lsr
-                0x00000000807fe220                uart_rx
-                0x00000000807fe224                uart_tx
- *(.sdata*)
-                0x00000000807fe228                . = ALIGN (0x4)
+ .text.startup  0x0000000020100338      0x114 kernelboot.o
+                0x0000000020100338                main
+                0x000000002010044c                . = ALIGN (0x4)
  *(.rodata)
  *(.rodata*)
  .rodata.str1.4
-                0x00000000807fe228        0xc kernelboot.o
- *(.srodata)
- *(.srodata*)
-                0x00000000807fe234                . = ALIGN (0x4)
-                0x00000000807fe234                _edata = .
+                0x000000002010044c       0x20 kernelboot.o
+                0x000000002010046c                . = ALIGN (0x4)
+                0x000000002010046c                _etext = .
+                0x000000002010046c                _sidata = _etext
 
-.bss            0x00000000807fe234        0x4 load address 0x00000000201002b0
-                0x00000000807fe234                . = ALIGN (0x4)
-                0x00000000807fe234                _sbss = .
+.rela.dyn       0x000000002010046c        0x0
+ .rela.text     0x000000002010046c        0x0 crt0.o
+
+.data           0x00000000807f8000       0x14 load address 0x000000002010046c
+                0x00000000807f8000                . = ALIGN (0x4)
+                0x00000000807f8000                _sdata = .
+                0x00000000807f8000                _ram_start = .
+ *(.text)
+ *(.text*)
+                0x00000000807f8000                . = ALIGN (0x4)
+ *(.data)
+ .data          0x00000000807f8000        0x0 crt0.o
+ .data          0x00000000807f8000        0x0 kernelboot.o
+ .data          0x00000000807f8000        0x0 /opt/riscv32im/lib/gcc/riscv32-unknown-elf/11.1.0/../../../../riscv32-unknown-elf/lib/libc.a(lib_a-memcpy.o)
+ *(.data*)
+ *(.sdata)
+ .sdata         0x00000000807f8000       0x14 kernelboot.o
+                0x00000000807f8000                spi
+                0x00000000807f8008                uart_lsr
+                0x00000000807f800c                uart_rx
+                0x00000000807f8010                uart_tx
+ *(.sdata*)
+                0x00000000807f8014                . = ALIGN (0x4)
+                0x00000000807f8014                _edata = .
+
+.bss            0x00000000807f8014        0x4 load address 0x0000000020100480
+                0x00000000807f8014                . = ALIGN (0x4)
+                0x00000000807f8014                _sbss = .
  *(.bss)
- .bss           0x00000000807fe234        0x0 crt0.o
- .bss           0x00000000807fe234        0x0 kernelboot.o
+ .bss           0x00000000807f8014        0x0 crt0.o
+ .bss           0x00000000807f8014        0x0 kernelboot.o
+ .bss           0x00000000807f8014        0x0 /opt/riscv32im/lib/gcc/riscv32-unknown-elf/11.1.0/../../../../riscv32-unknown-elf/lib/libc.a(lib_a-memcpy.o)
  *(.bss*)
  *(.sbss)
- .sbss          0x00000000807fe234        0x4 kernelboot.o
-                0x00000000807fe234                interrupt_occurred
+ .sbss          0x00000000807f8014        0x4 kernelboot.o
+                0x00000000807f8014                interrupt_occurred
  *(.sbss*)
  *(COMMON)
-                0x00000000807fe238                . = ALIGN (0x4)
-                0x00000000807fe238                _ebss = .
+                0x00000000807f8018                . = ALIGN (0x4)
+                0x00000000807f8018                _ebss = .
 
-.heap           0x00000000807fe238        0x0
-                0x00000000807fe238                . = ALIGN (0x4)
-                0x00000000807fe238                _heap_start = .
-                0x00000000807fe238                _end = .
+.heap           0x00000000807f8018        0x0
+                0x00000000807f8018                . = ALIGN (0x4)
+                0x00000000807f8018                _heap_start = .
+                0x00000000807f8018                _end = .
 OUTPUT(firmware.elf elf32-littleriscv)
 
 .riscv.attributes
@@ -103,7 +115,10 @@ OUTPUT(firmware.elf elf32-littleriscv)
                 0x0000000000000000       0x28 crt0.o
  .riscv.attributes
                 0x0000000000000028       0x2a kernelboot.o
+ .riscv.attributes
+                0x0000000000000052       0x21 /opt/riscv32im/lib/gcc/riscv32-unknown-elf/11.1.0/../../../../riscv32-unknown-elf/lib/libc.a(lib_a-memcpy.o)
 
 .comment        0x0000000000000000       0x12
  .comment       0x0000000000000000       0x12 kernelboot.o
                                          0x13 (size before relaxing)
+ .comment       0x0000000000000012       0x13 /opt/riscv32im/lib/gcc/riscv32-unknown-elf/11.1.0/../../../../riscv32-unknown-elf/lib/libc.a(lib_a-memcpy.o)

@@ -16,7 +16,7 @@
 MEMORY {
   FLASH      (rx)  : ORIGIN = 0x020100000, LENGTH = 0x10000000
  /*BRAM       (rwx) : ORIGIN = 0x000000000, LENGTH = 0x00002000*/
- BRAM       (rwx) : ORIGIN =   0x080000000 + (8*1024*1024 - (8*1024)), LENGTH = 0x00002000
+ BRAM       (rwx) : ORIGIN =   0x080000000 + (8*1024*1024 - (32*1024)), LENGTH = 0x00008000
 }
 
 __stacktop = ORIGIN(BRAM) + LENGTH(BRAM);
@@ -39,13 +39,17 @@ SECTIONS {
     } >FLASH
 
     /* C runtime initialization code and readonly data goes to the FLASH */
-    .text : {
+     .text : {
         . = ALIGN(4);
+        *(.text)                /* .text sections (code) */
+        *(.text*)               /* .text* sections (code) */
+        . = ALIGN(4);
+        *(.rodata)              /* .rodata sections (constants, strings, etc.) */
+        *(.rodata*)             /* .rodata* sections (constants, strings, etc.) */
         . = ALIGN(4);
         _etext = .;             /* define a global symbol at end of code */
         _sidata = _etext;       /* This is used by the startup in order to initialize the .data section */
     } >FLASH
-
 
     /*
      * This is the initialized data and fastcode section
@@ -68,12 +72,6 @@ SECTIONS {
         *(.data*)
         *(.sdata)
         *(.sdata*)
-        . = ALIGN(4);
-        *(.rodata)              /* .rodata sections (constants, strings, etc.) */
-        *(.rodata*)             /* .rodata* sections (constants, strings, etc.) */
-        *(.srodata)             /* .rodata sections (constants, strings, etc.) */
-        *(.srodata*)            /* .rodata* sections (constants, strings, etc.) */
-
         . = ALIGN(4);
         _edata = .;        /* define a global symbol at data end; used by startup code in order to initialise the .data section in RAM */
     } > BRAM
