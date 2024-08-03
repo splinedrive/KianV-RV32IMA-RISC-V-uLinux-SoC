@@ -49,7 +49,7 @@ module tb ();
 
   wire spi_flash_clk;
   wire spi_psram_clk;
-  assign #1 spi_flash_clk = uio_out[3];
+  assign spi_flash_clk = uio_out[3];
   assign spi_psram_clk = uio_out[3];
 
   wire spi_ce0 = uio_out[0];
@@ -83,7 +83,6 @@ module tb ();
   initial begin
     $dumpfile("tb.vcd");
     $dumpvars(0, tb);
-    #1;
   end
 
 
