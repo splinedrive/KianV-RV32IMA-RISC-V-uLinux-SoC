@@ -54,10 +54,10 @@ project:
 
 pinout:
   # Inputs
-  ui[0]: "uart_rx"
-  ui[1]: "spi_sio1_so_miso0"
-  ui[2]: ""
-  ui[3]: ""
+  ui[0]: ""
+  ui[1]: ""
+  ui[2]: "spi_sio1_so_miso0"
+  ui[3]: "uart_rx"
   ui[4]: ""
   ui[5]: ""
   ui[6]: ""
