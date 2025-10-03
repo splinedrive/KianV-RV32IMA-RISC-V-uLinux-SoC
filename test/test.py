@@ -39,7 +39,7 @@ def spi_slave(dut, clock, cs, mosi, miso):
     for bit_index in range(32):
         yield RisingEdge(clock)
         out_buff = BinaryValue(
-            value=(out_buff.value << 1) | mosi.value.integer, n_bits=32, bigEndian=False
+            value=(out_buff.integer << 1) | mosi.value.integer, n_bits=32, bigEndian=False
         )
         spi_log(dut, f"Read bit {mosi.value.integer}, buffer now {out_buff.binstr}")
 
