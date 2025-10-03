@@ -77,14 +77,37 @@ async def test_uart(dut):
     assert data == expected_str
 
     # The code should convert these to lowercase and echo them
-    await uart_source.write(b"Q")
+    await uart_source.write(b"K")
+    await ClockCycles(dut.clk, 2500)
+    await uart_source.write(b"I")
     await ClockCycles(dut.clk, 2500)
     await uart_source.write(b"A")
+    await ClockCycles(dut.clk, 2500)
+    await uart_source.write(b"N")
+    await ClockCycles(dut.clk, 2500)
+    await uart_source.write(b"V")
     await ClockCycles(dut.clk, 4000)
 
-    data = uart_sink.read_nowait(2)
+    data = uart_sink.read_nowait(5)
     dut._log.info(f"UART Data: {data}")
-    assert data == b"qa"
+    assert data == b"kianv"
+
+
+@cocotb.test()
+async def test_spi(dut):
+    dut._log.info("start")
+    dut.test_sel.value = 0
+    clock = Clock(dut.clk, 100, unit="ns")
+    cocotb.start_soon(clock.start())
+    spi_task = cocotb.start_soon(
+        spi_slave(
+            dut,
+            dut.spi_sclk0,
+            dut.spi_cen0,
+            dut.spi_sio0_si_mosi0,
+            dut.spi_sio1_so_miso0,
+        )
+    )
 
 
 @cocotb.test()
