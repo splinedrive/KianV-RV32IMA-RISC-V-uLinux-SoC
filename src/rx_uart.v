@@ -44,8 +44,6 @@ module rx_uart (
     end
   end
 
-  wire start_bit_detected;
-
   wire fifo_full;
   wire fifo_empty;
   wire [7:0] fifo_out;
@@ -69,11 +67,11 @@ module rx_uart (
 
   always @(posedge clk) begin
     /*
-            if (ready) begin
-              $write("%c", rcvd_buf);
-              $fflush;
-            end
-            */
+                if (ready) begin
+                  $write("%c", rcvd_buf);
+                  $fflush;
+                end
+                */
 
     if (!resetn) begin
       state <= 0;
